@@ -128,4 +128,24 @@ SJO_DEFINE_RANGE_INT (unsigned long long int)
 
 } // namespace sjo
 
+
+
+namespace sjo
+{
+
+// Overload for std::istream et al.
+template <typename T, typename CharT>
+sjo::range_wrapper_type <std::istream_iterator <T>> range (std::basic_istream <CharT>& is)
+{
+	return {std::istream_iterator <T> (is), {}};
+}
+
+template <typename CharT>
+sjo::range_wrapper_type <std::istreambuf_iterator <CharT>> range (std::basic_istream <CharT>& is)
+{
+	return {std::istreambuf_iterator <CharT> (is), {}};
+}
+
+}
+
 #endif
