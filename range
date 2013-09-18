@@ -1,0 +1,131 @@
+// -*- mode: c++; -*-
+
+#ifndef SJO_RANGE_BUILDER_HH
+#define SJO_RANGE_BUILDER_HH
+
+#include <utility>
+
+namespace sjo
+{
+
+template <typename Iterator>
+struct range_wrapper_type
+{
+	Iterator _begin;
+	Iterator _end;
+
+	constexpr
+	range_wrapper_type (Iterator first, Iterator last = Iterator {})
+		: _begin (std::move (first)),
+		  _end (std::move (last))
+	{
+	}
+
+	constexpr
+	Iterator begin () const
+	{
+		return _begin;
+	}
+
+	constexpr
+	Iterator end () const
+	{
+		return _end;
+	}
+};
+
+template <typename Iterator>
+inline constexpr
+range_wrapper_type <Iterator> range (Iterator first, Iterator last)
+{
+	return range_wrapper_type <Iterator> (std::move (first), std::move (last));
+}
+
+} // namespace sjo
+
+
+
+#include <iterator>
+
+namespace sjo
+{
+
+template <typename Integer>
+struct int_iterator
+	: std::iterator <std::input_iterator_tag,
+	                 Integer,
+	                 decltype (Integer {} - Integer {})>
+{
+	using value_type = typename std::iterator_traits <int_iterator>::value_type;
+	value_type _value;
+
+	constexpr
+	int_iterator (value_type value)
+		: _value (value)
+	{
+	}
+
+	int_iterator& operator ++()
+	{
+		++_value;
+		return *this;
+	}
+
+	constexpr
+	value_type operator *()
+	{
+		return _value;
+	}
+
+	constexpr
+	bool operator == (int_iterator other)
+	{
+		return _value == other._value;
+	}
+
+	constexpr
+	bool operator != (int_iterator other)
+	{
+		return _value != other._value;
+	}
+};
+
+// range_wrapper_type <int_iterator <Integral>> range (Integral first, Integral last)
+// {
+// 	return {first, last};
+// }
+
+#define SJO_DEFINE_RANGE_INT(type)                                              \
+inline constexpr                                                                \
+range_wrapper_type <int_iterator <type>> range (type first,                     \
+                                                type last)                      \
+{                                                                               \
+	return {first, last};                                                   \
+}
+
+// Overload for all integral types
+SJO_DEFINE_RANGE_INT (bool)
+
+SJO_DEFINE_RANGE_INT (char)
+SJO_DEFINE_RANGE_INT (signed char)
+SJO_DEFINE_RANGE_INT (unsigned char)
+
+SJO_DEFINE_RANGE_INT (wchar_t)
+SJO_DEFINE_RANGE_INT (char16_t)
+SJO_DEFINE_RANGE_INT (char32_t)
+
+SJO_DEFINE_RANGE_INT (short int)
+SJO_DEFINE_RANGE_INT (unsigned short int)
+
+SJO_DEFINE_RANGE_INT (int)
+SJO_DEFINE_RANGE_INT (unsigned int)
+
+SJO_DEFINE_RANGE_INT (long int)
+SJO_DEFINE_RANGE_INT (unsigned long int)
+
+SJO_DEFINE_RANGE_INT (long long int)
+SJO_DEFINE_RANGE_INT (unsigned long long int)
+
+} // namespace sjo
+
+#endif
