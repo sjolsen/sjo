@@ -1,7 +1,7 @@
 // -*- mode: c++; -*-
 
-#ifndef SJO_RANGE_BUILDER_HH
-#define SJO_RANGE_BUILDER_HH
+#ifndef SJO_RANGE_HH
+#define SJO_RANGE_HH
 
 #include <utility>
 
@@ -38,7 +38,8 @@ template <typename Iterator>
 inline constexpr
 range_wrapper_type <Iterator> range (Iterator first, Iterator last)
 {
-	return range_wrapper_type <Iterator> (std::move (first), std::move (last));
+	return range_wrapper_type <Iterator> (std::move (first),
+	                                      std::move (last));
 }
 
 } // namespace sjo
@@ -56,7 +57,16 @@ struct int_iterator
 	                 Integer,
 	                 decltype (Integer {} - Integer {})>
 {
-	using value_type = typename std::iterator_traits <int_iterator>::value_type;
+	using iterator = std::iterator <std::input_iterator_tag,
+	                 Integer,
+                         decltype (Integer {} - Integer {})>;
+
+	using typename iterator::value_type;
+	using typename iterator::difference_type;
+	using typename iterator::pointer;
+	using typename iterator::reference;
+	using typename iterator::iterator_category;
+
 	value_type _value;
 
 	constexpr
@@ -90,7 +100,8 @@ struct int_iterator
 	}
 };
 
-// range_wrapper_type <int_iterator <Integral>> range (Integral first, Integral last)
+// range_wrapper_type <int_iterator <Integral>>
+// range (Integral first, Integral last)
 // {
 // 	return {first, last};
 // }
@@ -135,17 +146,19 @@ namespace sjo
 
 // Overload for std::istream et al.
 template <typename T, typename CharT>
-sjo::range_wrapper_type <std::istream_iterator <T>> range (std::basic_istream <CharT>& is)
+sjo::range_wrapper_type <std::istream_iterator <T>>
+range (std::basic_istream <CharT>& is)
 {
 	return {std::istream_iterator <T> (is), {}};
 }
 
 template <typename CharT>
-sjo::range_wrapper_type <std::istreambuf_iterator <CharT>> range (std::basic_istream <CharT>& is)
+sjo::range_wrapper_type <std::istreambuf_iterator <CharT>>
+range (std::basic_istream <CharT>& is)
 {
 	return {std::istreambuf_iterator <CharT> (is), {}};
 }
 
-}
+} // namespace sjo
 
 #endif

@@ -1,0 +1,37 @@
+// -*- mode: c++; -*-
+
+#ifndef SJO_ALGO_COPY_UNTIL
+#define SJO_ALGO_COPY_UNTIL
+
+#include <utility>
+
+namespace sjo
+{
+
+template <typename InputIterator, typename OutputIterator, typename UnaryPredicate>
+std::pair <InputIterator, OutputIterator>
+copy_until (InputIterator in_begin, InputIterator in_end, OutputIterator out_begin,
+            UnaryPredicate is_delimiter)
+{
+	while (in_begin != in_end && !is_delimiter (*in_begin))
+		*out_begin++ = *in_begin++;
+	return {in_begin, out_begin};
+}
+
+template <typename InputIterator, typename OutputIterator, typename UnaryPredicate>
+inline
+std::pair <InputIterator, OutputIterator>
+copy_until (InputIterator in_begin, InputIterator in_end, OutputIterator out_begin,
+            const typename InputIterator::value_type& delimiter)
+{
+	using std::move;
+	return copy_until (move (in_begin), move (in_end), move (out_begin),
+	                   [&] (const decltype (delimiter)& element)
+        {
+	        return element != delimiter;
+        }
+}
+
+} // namespace sjo
+
+#endif
