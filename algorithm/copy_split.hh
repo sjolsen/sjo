@@ -1,10 +1,8 @@
-// -*- mode: c++; -*-
-
-#ifndef SJO_ALGO_COPY_SPLIT_HEADER
-#define SJO_ALGO_COPY_SPLIT_HEADER
+#ifndef SJO_ALGORITHM_COPY_SPLIT_HEADER
+#define SJO_ALGORITHM_COPY_SPLIT_HEADER
 
 #include <tuple>
-#include <sjo/algo/copy_until>
+#include <sjo/copy_until.hh>
 
 // OutputIterator::value_type should be an output iterator constructible from a
 // range of InputIterator
@@ -40,4 +38,4 @@ copy_split (InputIterator in_begin, InputIterator in_end, OutputIterator out_beg
 	                   delimiter);
 }
 
-#endif // SJO_ALGO_COPY_SPLIT_HEADER
+#endif // SJO_ALGORITHM_COPY_SPLIT_HEADER

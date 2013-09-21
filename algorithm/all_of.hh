@@ -1,15 +1,13 @@
-// -*- mode: c++; -*-
+#ifndef SJO_ALGORITHM_ALL_OF_HEADER
+#define SJO_ALGORITHM_ALL_OF_HEADER
 
-#ifndef SJO_ALGO_STD_ALGORITHM_ALL_OF_HEADER
-#define SJO_ALGO_STD_ALGORITHM_ALL_OF_HEADER
-
-#include <sjo/range>
-#include "impl/comp_ops"
+#include <sjo/range.hh>
+#include <sjo/comp_ops.hh>
 
 namespace sjo
 {
 
-template <class InputIterator, class Predicate = sjo::impl::is_true>
+template <class InputIterator, class Predicate = sjo::is_true>
 inline bool
 all_of (InputIterator _first, InputIterator _last,
         Predicate _pred = Predicate {})
@@ -24,7 +22,10 @@ all_of (InputIterator _first, InputIterator _last,
 	return true;
 }
 
-template <class InputIterator, class Predicate = sjo::impl::is_true>
+
+
+// Range overload
+template <class InputIterator, class Predicate = sjo::is_true>
 inline bool
 all_of (sjo::range_wrapper_type <InputIterator> _range,
         Predicate _pred = Predicate {})
@@ -32,14 +33,16 @@ all_of (sjo::range_wrapper_type <InputIterator> _range,
 	return sjo::all_of (_range.begin (), _range.end (), std::move (_pred));
 }
 
-template <class Container, class Predicate = sjo::impl::is_true>
+// Container overload
+template <class Container, class Predicate = sjo::is_true>
 inline bool
 all_of (const Container& _container, Predicate _pred = Predicate {})
 {
 	return sjo::all_of (sjo::range (_container), std::move (_pred));
 }
 
-template <class T, class Predicate = sjo::impl::is_true>
+// Initializer list overload
+template <class T, class Predicate = sjo::is_true>
 inline bool
 all_of (const std::initializer_list <T>& _list, Predicate _pred = Predicate {})
 {
@@ -48,4 +51,4 @@ all_of (const std::initializer_list <T>& _list, Predicate _pred = Predicate {})
 
 } // namespace sjo
 
-#endif // SJO_ALGO_STD_ALGORITHM_ALL_OF_HEADER
+#endif // SJO_ALGORITHM_ALL_OF_HEADER

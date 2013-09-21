@@ -1,52 +1,8 @@
-// -*- mode: c++; -*-
-
-#ifndef SJO_RANGE_HEADER
-#define SJO_RANGE_HEADER
-
-#include <utility>
-
-namespace sjo
-{
-
-template <typename Iterator>
-struct range_wrapper_type
-{
-	Iterator _begin;
-	Iterator _end;
-
-	constexpr
-	range_wrapper_type (Iterator first, Iterator last = Iterator {})
-		: _begin (std::move (first)),
-		  _end (std::move (last))
-	{
-	}
-
-	constexpr
-	Iterator begin () const
-	{
-		return _begin;
-	}
-
-	constexpr
-	Iterator end () const
-	{
-		return _end;
-	}
-};
-
-template <typename Iterator>
-inline
-range_wrapper_type <Iterator> range (Iterator first, Iterator last)
-{
-	return range_wrapper_type <Iterator> (std::move (first),
-	                                      std::move (last));
-}
-
-} // namespace sjo
-
-
+#ifndef SJO_RANGE_INT_RANGE_HEADER
+#define SJO_RANGE_INT_RANGE_HEADER
 
 #include <iterator>
+#include "range_wrapper.hh"
 
 namespace sjo
 {
@@ -137,50 +93,6 @@ SJO_DEFINE_RANGE_INT (unsigned long int)
 SJO_DEFINE_RANGE_INT (long long int)
 SJO_DEFINE_RANGE_INT (unsigned long long int)
 
-
-
-template <typename Container>
-inline sjo::range_wrapper_type <typename Container::iterator>
-range (Container& _container)
-{
-	using std::begin;
-	using std::end;
-	return {begin (_container), end (_container)};
-}
-
-template <typename Container>
-inline sjo::range_wrapper_type <typename Container::const_iterator>
-range (const Container& _container)
-{
-	using std::begin;
-	using std::end;
-	return {begin (_container), end (_container)};
-}
-
-template <typename T>
-inline sjo::range_wrapper_type <typename std::initializer_list <T>::iterator>
-range (const std::initializer_list <T>& _list)
-{
-	return {_list.begin (), _list.end ()};
-}
-
-
-
-// Overload for std::istream et al.
-template <typename T, typename CharT>
-inline sjo::range_wrapper_type <std::istream_iterator <T>>
-range (std::basic_istream <CharT>& is)
-{
-	return {std::istream_iterator <T> (is), {}};
-}
-
-template <typename CharT>
-inline sjo::range_wrapper_type <std::istreambuf_iterator <CharT>>
-range (std::basic_istream <CharT>& is)
-{
-	return {std::istreambuf_iterator <CharT> (is), {}};
-}
-
 } // namespace sjo
 
-#endif // SJO_RANGE_HEADER
+#endif // SJO_RANGE_INT_RANGE_HEADER

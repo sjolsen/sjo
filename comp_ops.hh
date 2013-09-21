@@ -1,15 +1,39 @@
-// -*- mode: c++; -*-
-
-#ifndef SJO_ALGO_STD_ALGORITHM_IMPL_COMP_OPS_HEADER
-#define SJO_ALGO_STD_ALGORITHM_IMPL_COMP_OPS_HEADER
+#ifndef SJO_COMP_OPS_HEADER
+#define SJO_COMP_OPS_HEADER
 
 #include <utility>
 
 namespace sjo
 {
 
-namespace impl
+template <typename T>
+struct comparator
 {
+	const T& _t;
+
+	comparator (const T& t)
+		: _t (t)
+	{
+	}
+
+	comparator (T&& t) = delete;
+
+	template <typename U>
+	inline bool
+	operator () (U&& _u) const
+	{
+		return std::forward <U> (_u) == _t;
+	}
+};
+
+template <typename T>
+inline sjo::comparator <T>
+make_comparator (const T& _t)
+{
+	return _t;
+}
+
+
 
 #define SJO_DEFINE_OPERATOR_FUNCTOR(NAME_, BINOP_)                      \
 struct NAME_                                                            \
@@ -29,6 +53,8 @@ SJO_DEFINE_OPERATOR_FUNCTOR (equal_to,     ==);
 SJO_DEFINE_OPERATOR_FUNCTOR (not_equal_to, !=);
 SJO_DEFINE_OPERATOR_FUNCTOR (less,          <);
 
+
+
 #define SJO_DEFINE_UNARY_OPERATOR_FUNCTOR(NAME_, UNOP_)                 \
 struct NAME_                                                            \
 {                                                                       \
@@ -44,8 +70,6 @@ struct NAME_                                                            \
 SJO_DEFINE_UNARY_OPERATOR_FUNCTOR (is_true,   (bool));
 SJO_DEFINE_UNARY_OPERATOR_FUNCTOR (is_false, !(bool));
 
-} // namespace sjo::impl
-
 } // namespace sjo
 
-#endif // SJO_ALGO_STD_ALGORITHM_IMPL_COMP_OPS_HEADER
+#endif // SJO_COMP_OPS_HEADER
