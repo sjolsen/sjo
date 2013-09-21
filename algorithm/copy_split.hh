@@ -1,41 +1,17 @@
 #ifndef SJO_ALGORITHM_COPY_SPLIT_HEADER
 #define SJO_ALGORITHM_COPY_SPLIT_HEADER
 
-#include <tuple>
-#include <sjo/copy_until.hh>
+#include <sjo/comp_ops.hh>
+#include <sjo/range.hh>
+#include "impl/copy_split.hh"
+#include "impl/adaptor_macros.hh"
 
-// OutputIterator::value_type should be an output iterator constructible from a
-// range of InputIterator
-template <typename InputIterator, typename OutputIterator, typename UnaryPredicate>
-std::pair <InputIterator, OutputIterator>
-copy_split (InputIterator in_begin, InputIterator in_end, OutputIterator out_begin,
-            UnaryPredicate is_delimiter)
+namespace sjo
 {
-	using std::move;
-	while (true)
-	{
-		if (in_begin == in_end)
-			return out_begin;
-		if (is_delimiter (*in_begin))
-		{
-			++in_begin;
-			continue;
-		}
-		std::tie (in_begin, out_begin) =
-			copy_until (move (in_begin), in_end, move (out_begin),
-			            is_delimiter);
-	}
-}
 
-template <typename InputIterator, typename OutputIterator, typename UnaryPredicate>
-inline
-std::pair <InputIterator, OutputIterator>
-copy_split (InputIterator in_begin, InputIterator in_end, OutputIterator out_begin,
-            const typename InputIterator::value_type& delimiter)
-{
-	using std::move;
-	return copy_split (move (in_begin), move (in_end), move (out_begin),
-	                   delimiter);
-}
+SJO_ALGORITHM_IRANGE_OITER_UNARY_COPY_ADAPTOR       (copy_split);
+SJO_ALGORITHM_IRANGE_OITER_UNARY_COMPARATOR_ADAPTOR (copy_split);
+
+} // namespace sjo
 
 #endif // SJO_ALGORITHM_COPY_SPLIT_HEADER

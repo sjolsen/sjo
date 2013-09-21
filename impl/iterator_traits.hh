@@ -23,9 +23,9 @@ struct iterator_category_of
 };
 
 template <typename T>
-struct iterator_category_of <T, typename sjo::impl::void_if_exists <typename T::iterator_category>::type>
+struct iterator_category_of <T, typename sjo::impl::void_if_exists <typename std::iterator_traits <T>::iterator_category>::type>
 {
-	using type = typename T::iterator_category;
+	using type = typename std::iterator_traits <T>::iterator_category;
 };
 
 
