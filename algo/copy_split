@@ -1,7 +1,7 @@
 // -*- mode: c++; -*-
 
-#ifndef SJO_ALGO_COPY_SPLIT
-#define SJO_ALGO_COPY_SPLIT
+#ifndef SJO_ALGO_COPY_SPLIT_HEADER
+#define SJO_ALGO_COPY_SPLIT_HEADER
 
 #include <tuple>
 #include <sjo/algo/copy_until>
@@ -40,4 +40,4 @@ copy_split (InputIterator in_begin, InputIterator in_end, OutputIterator out_beg
 	                   delimiter);
 }
 
-#endif
+#endif // SJO_ALGO_COPY_SPLIT_HEADER

@@ -1,0 +1,51 @@
+// -*- mode: c++; -*-
+
+#ifndef SJO_ALGO_STD_ALGORITHM_IMPL_COMP_OPS_HEADER
+#define SJO_ALGO_STD_ALGORITHM_IMPL_COMP_OPS_HEADER
+
+#include <utility>
+
+namespace sjo
+{
+
+namespace impl
+{
+
+#define SJO_DEFINE_OPERATOR_FUNCTOR(NAME_, BINOP_)                      \
+struct NAME_                                                            \
+{                                                                       \
+	template <typename T, typename U>                               \
+	inline auto                                                     \
+	operator () (T&& _t, U&& _u)                                    \
+		-> decltype (std::forward <T> (_t) BINOP_               \
+		             std::forward <U> (_u))                     \
+	{                                                               \
+		return std::forward <T> (_t) BINOP_                     \
+		       std::forward <U> (_u);                           \
+	}                                                               \
+}
+
+SJO_DEFINE_OPERATOR_FUNCTOR (equal_to,     ==);
+SJO_DEFINE_OPERATOR_FUNCTOR (not_equal_to, !=);
+SJO_DEFINE_OPERATOR_FUNCTOR (less,          <);
+
+#define SJO_DEFINE_UNARY_OPERATOR_FUNCTOR(NAME_, UNOP_)                 \
+struct NAME_                                                            \
+{                                                                       \
+	template <typename T>                                           \
+	inline auto                                                     \
+	operator () (T&& _t)                                            \
+		-> decltype (UNOP_ std::forward <T> (_t))               \
+	{                                                               \
+		return UNOP_ std::forward <T> (_t);                     \
+	}                                                               \
+}
+
+SJO_DEFINE_UNARY_OPERATOR_FUNCTOR (is_true,   (bool));
+SJO_DEFINE_UNARY_OPERATOR_FUNCTOR (is_false, !(bool));
+
+} // namespace sjo::impl
+
+} // namespace sjo
+
+#endif // SJO_ALGO_STD_ALGORITHM_IMPL_COMP_OPS_HEADER

@@ -1,7 +1,7 @@
 // -*- mode: c++; -*-
 
-#ifndef SJO_ALGO_COPY_UNTIL
-#define SJO_ALGO_COPY_UNTIL
+#ifndef SJO_ALGO_COPY_UNTIL_HEADER
+#define SJO_ALGO_COPY_UNTIL_HEADER
 
 #include <utility>
 
@@ -34,4 +34,4 @@ copy_until (InputIterator in_begin, InputIterator in_end, OutputIterator out_beg
 
 } // namespace sjo
 
-#endif
+#endif // SJO_ALGO_COPY_UNTIL_HEADER

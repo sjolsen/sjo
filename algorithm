@@ -1,9 +1,9 @@
 // -*- mode: c++; -*-
 
-#ifndef SJO_ALGORITHM_HH
-#define SJO_ALGORITHM_HH
+#ifndef SJO_ALGORITHM_HEADER
+#define SJO_ALGORITHM_HEADER
 
 #include <sjo/algo/copy_until>
 #include <sjo/algo/copy_split>
 
-#endif
+#endif // SJO_ALGORITHM_HEADER

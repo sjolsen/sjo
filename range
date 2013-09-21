@@ -1,7 +1,7 @@
 // -*- mode: c++; -*-
 
-#ifndef SJO_RANGE_HH
-#define SJO_RANGE_HH
+#ifndef SJO_RANGE_HEADER
+#define SJO_RANGE_HEADER
 
 #include <utility>
 
@@ -35,7 +35,7 @@ struct range_wrapper_type
 };
 
 template <typename Iterator>
-inline constexpr
+inline
 range_wrapper_type <Iterator> range (Iterator first, Iterator last)
 {
 	return range_wrapper_type <Iterator> (std::move (first),
@@ -137,23 +137,45 @@ SJO_DEFINE_RANGE_INT (unsigned long int)
 SJO_DEFINE_RANGE_INT (long long int)
 SJO_DEFINE_RANGE_INT (unsigned long long int)
 
-} // namespace sjo
+
+
+template <typename Container>
+inline sjo::range_wrapper_type <typename Container::iterator>
+range (Container& _container)
+{
+	using std::begin;
+	using std::end;
+	return {begin (_container), end (_container)};
+}
+
+template <typename Container>
+inline sjo::range_wrapper_type <typename Container::const_iterator>
+range (const Container& _container)
+{
+	using std::begin;
+	using std::end;
+	return {begin (_container), end (_container)};
+}
+
+template <typename T>
+inline sjo::range_wrapper_type <typename std::initializer_list <T>::iterator>
+range (const std::initializer_list <T>& _list)
+{
+	return {_list.begin (), _list.end ()};
+}
 
 
 
-namespace sjo
-{
-
 // Overload for std::istream et al.
 template <typename T, typename CharT>
-sjo::range_wrapper_type <std::istream_iterator <T>>
+inline sjo::range_wrapper_type <std::istream_iterator <T>>
 range (std::basic_istream <CharT>& is)
 {
 	return {std::istream_iterator <T> (is), {}};
 }
 
 template <typename CharT>
-sjo::range_wrapper_type <std::istreambuf_iterator <CharT>>
+inline sjo::range_wrapper_type <std::istreambuf_iterator <CharT>>
 range (std::basic_istream <CharT>& is)
 {
 	return {std::istreambuf_iterator <CharT> (is), {}};
@@ -161,4 +183,4 @@ range (std::basic_istream <CharT>& is)
 
 } // namespace sjo
 
-#endif
+#endif // SJO_RANGE_HEADER
