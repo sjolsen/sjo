@@ -1,10 +1,10 @@
 #ifndef SJO_ALGORITHM_IMPL_ADAPTOR_MACROS_HEADER
 #define SJO_ALGORITHM_IMPL_ADAPTOR_MACROS_HEADER
 
-#define SJO_ALGORITHM_IRANGE_UNARY_ADAPTOR(NAME_)                               \
+#define SJO_ALGORITHM_IRANGE_UNARY_ADAPTOR(NAME_, RETTYPE_)                     \
 /* Range overload */                                                            \
 template <class InputIterator, class Predicate = sjo::is_true>                  \
-inline bool                                                                     \
+inline RETTYPE_                                                                 \
 NAME_ (sjo::range_wrapper_type <InputIterator> _range,                          \
        Predicate _pred = Predicate {})                                          \
 {                                                                               \
@@ -13,7 +13,7 @@ NAME_ (sjo::range_wrapper_type <InputIterator> _range,                          
                                                                                 \
 /* Container overload */                                                        \
 template <class Container, class Predicate = sjo::is_true>                      \
-inline bool                                                                     \
+inline RETTYPE_                                                                 \
 NAME_ (const Container& _container, Predicate _pred = Predicate {})             \
 {                                                                               \
 	return sjo::NAME_ (sjo::range (_container), std::move (_pred));         \
@@ -21,10 +21,68 @@ NAME_ (const Container& _container, Predicate _pred = Predicate {})             
                                                                                 \
 /* Initializer list overload */                                                 \
 template <class T, class Predicate = sjo::is_true>                              \
-inline bool                                                                     \
+inline RETTYPE_                                                                 \
 NAME_ (const std::initializer_list <T>& _list, Predicate _pred = Predicate {})  \
 {                                                                               \
 	return sjo::NAME_ (sjo::range (_list), std::move (_pred));              \
+}
+
+
+
+#define SJO_ALGORITHM_IRANGE_IRANGE_BINARY_ADAPTOR(NAME_, RETTYPE_)             \
+/* Range overload */                                                            \
+template <class InputIterator1, class InputIterator2,                           \
+          class BinaryOperator = sjo::equal_to>                                 \
+inline RETTYPE_                                                                 \
+NAME_ (sjo::range_wrapper_type <InputIterator1> _range1,                        \
+       sjo::range_wrapper_type <InputIterator2> _range2,                        \
+       BinaryOperator _pred = BinaryOperator {})                                \
+{                                                                               \
+	return sjo::NAME_ (_range1.begin (), _range1.end (),                    \
+	                   _range2.begin (), _range2.end (),                    \
+	                   std::move (_pred));                                  \
+}                                                                               \
+                                                                                \
+/* Container overload */                                                        \
+template <class InputIterator1, class Container2,                               \
+          class BinaryOperator = sjo::equal_to>                                 \
+inline RETTYPE_                                                                 \
+NAME_ (sjo::range_wrapper_type <InputIterator1> _range1,                        \
+       const Container2& _container2,                                           \
+       BinaryOperator _pred = BinaryOperator {})                                \
+{                                                                               \
+	return sjo::NAME_ (std::move (_range1),                                 \
+	                   sjo::range (_container2),                            \
+	                   std::move (_pred));                                  \
+}                                                                               \
+                                                                                \
+template <class Container1, typename... Rest>                                   \
+inline RETTYPE_                                                                 \
+NAME_ (const Container1& _container1, Rest&&... _rest)                          \
+{                                                                               \
+	return sjo::NAME_ (sjo::range (_container1),                            \
+	                   std::forward <Rest> (_rest)...);                     \
+}                                                                               \
+                                                                                \
+/* Initializer list overload */                                                 \
+template <class InputIterator1, class T2,                                       \
+          class BinaryOperator = sjo::equal_to>                                 \
+inline RETTYPE_                                                                 \
+NAME_ (sjo::range_wrapper_type <InputIterator1> _range1,                        \
+       const std::initializer_list <T2>& _list2,                                \
+       BinaryOperator _pred = BinaryOperator {})                                \
+{                                                                               \
+	return sjo::NAME_ (std::move (_range1),                                 \
+	                   sjo::range (_list2),                                 \
+	                   std::move (_pred));                                  \
+}                                                                               \
+                                                                                \
+template <class T1, typename... Rest>                                           \
+inline RETTYPE_                                                                 \
+NAME_ (const std::initializer_list <T1>& _list1, Rest&&... _rest)               \
+{                                                                               \
+	return sjo::NAME_ (sjo::range (_list1),                                 \
+	                   std::forward <Rest> (_rest)...);                     \
 }
 
 
@@ -70,7 +128,7 @@ NAME_ (const std::initializer_list <T>& in_list,                                
 	                   std::move (is_delimiter));                           \
 }
 
-#define SJO_ALGORITHM_IRANGE_OITER_UNARY_COMPARATOR_ADAPTOR(NAME_)              \
+#define SJO_ALGORITHM_IRANGE_OITER_COMPARATOR_COPY_ADAPTOR(NAME_)               \
 /* Range overload */                                                            \
 template <typename InputIterator, typename OutputIterator, typename Delimiter>  \
 inline std::pair <InputIterator, OutputIterator>                                \

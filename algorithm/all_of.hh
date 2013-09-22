@@ -9,7 +9,7 @@
 namespace sjo
 {
 
-SJO_ALGORITHM_IRANGE_UNARY_ADAPTOR (all_of);
+SJO_ALGORITHM_IRANGE_UNARY_ADAPTOR (all_of, bool);
 
 } // namespace sjo
 
