@@ -2,21 +2,13 @@
 #define SJO_ALGORITHM_IMPL_ADAPTOR_MACROS_HEADER
 
 #define SJO_ALGORITHM_IRANGE_UNARY_ADAPTOR(NAME_, RETTYPE_)                     \
-/* Range overload */                                                            \
-template <class InputIterator, class Predicate = sjo::is_true>                  \
+template <class Rangeable, class Predicate = sjo::is_true>                      \
 inline RETTYPE_                                                                 \
-NAME_ (sjo::range_wrapper_type <InputIterator> _range,                          \
+NAME_ (Rangeable _rangeable,                                                    \
        Predicate _pred = Predicate {})                                          \
-{                                                                               \
+{										\
+	auto _range = sjo::range (_rangeable);                                  \
 	return sjo::NAME_ (_range.begin (), _range.end (), std::move (_pred));  \
-}                                                                               \
-                                                                                \
-/* Container overload */                                                        \
-template <class Container, class Predicate = sjo::is_true>                      \
-inline RETTYPE_                                                                 \
-NAME_ (const Container& _container, Predicate _pred = Predicate {})             \
-{                                                                               \
-	return sjo::NAME_ (sjo::range (_container), std::move (_pred));         \
 }                                                                               \
                                                                                 \
 /* Initializer list overload */                                                 \

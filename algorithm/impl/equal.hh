@@ -8,9 +8,6 @@
 namespace sjo
 {
 
-namespace impl
-{
-
 template <class InputIterator1, class InputIterator2, class BinaryOperator>
 inline bool
 equal_common (InputIterator1& _first1, const InputIterator1& _last1,
@@ -40,9 +37,9 @@ equal (InputIterator1 _first1, InputIterator1 _last1,
        InputIterator2 _first2, InputIterator2 _last2,
        BinaryOperator _pred)
 {
-	bool common_part_equal = sjo::impl::equal_common (_first1, _last1,
-	                                                  _first2, _last2,
-	                                                  _pred);
+	bool common_part_equal = sjo::equal_common (_first1, _last1,
+	                                            _first2, _last2,
+	                                            _pred);
 	return common_part_equal && _first1 == _last1 && _first2 == _last2;
 }
 
@@ -57,12 +54,10 @@ equal (RandomAccessIterator1 _first1, RandomAccessIterator1 _last1,
 {
 	if (_last1 - _first1 != _last2 - _first2)
 		return false;
-	return sjo::impl::equal_common (_first1, _last1,
-	                                _first2, _last2,
-	                                _pred);
+	return sjo::equal_common (_first1, _last1,
+	                          _first2, _last2,
+	                          _pred);
 }
-
-} // namespace sjo::impl
 
 } // namespace sjo
 

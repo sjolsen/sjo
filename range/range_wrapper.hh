@@ -33,11 +33,18 @@ struct range_wrapper_type
 };
 
 template <typename Iterator>
-inline
-range_wrapper_type <Iterator> range (Iterator first, Iterator last)
+inline range_wrapper_type <Iterator>
+range (Iterator first, Iterator last)
 {
 	return range_wrapper_type <Iterator> (std::move (first),
 	                                      std::move (last));
+}
+
+template <typename T>
+inline range_wrapper_type <T>
+range (range_wrapper_type <T> _range)
+{
+	return _range;
 }
 
 } // namespace sjo
