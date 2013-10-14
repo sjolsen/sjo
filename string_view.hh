@@ -50,7 +50,7 @@ public:
 	using difference_type        = std::ptrdiff_t;
 
 	static constexpr
-	size_type npos = std::numeric_limits <size_type>::max ();
+	size_type npos = size_type {0} - 1;
 
 private:
 	pointer _begin;
@@ -298,67 +298,118 @@ public:
 
 	size_type find (const charT* s) const noexcept
 	{
-		return find (basic_string_view {s});
+		return this->find (basic_string_view {s});
 	}
 
 	size_type rfind (basic_string_view s) const noexcept
 	{
+		for (size_type xpos = this->size () - s.size (); xpos != npos; --xpos)
+			if (_substr (xpos).starts_with (s))
+				return xpos;
+		return npos;
 	}
 
 	size_type rfind (charT c) const noexcept
 	{
+		for (size_type xpos = this->size () - 1; xpos != npos; --xpos)
+			if (traits::eq (_begin [xpos], c))
+				return xpos;
+		return npos;
 	}
 
 	size_type rfind (const charT* s) const noexcept
 	{
+		return this->rfind (basic_string_view {s});
 	}
 
 	size_type find_first_of (basic_string_view s) const noexcept
 	{
+		for (size_type xpos = 0; xpos < this->size (); ++xpos)
+			for (auto c : s)
+				if (traits::eq (_begin [xpos], c))
+					return xpos;
+		return npos;
 	}
 
 	size_type find_first_of (charT c) const noexcept
 	{
+		return this->find (c);
 	}
 
 	size_type find_first_of (const charT* s) const noexcept
 	{
+		return this->find_first_of (basic_string_view {s});
 	}
 
 	size_type find_last_of (basic_string_view s) const noexcept
 	{
+		for (size_type xpos = this->size () - 1; xpos != npos; --xpos)
+			for (auto c : s)
+				if (traits::eq (_begin [xpos], c))
+					return xpos;
+		return npos;
 	}
 
 	size_type find_last_of (charT c) const noexcept
 	{
+		return this->rfind (c);
 	}
 
 	size_type find_last_of (const charT* s) const noexcept
 	{
+		return this->find_last_of (basic_string_view {s});
 	}
 
 	size_type find_first_not_of (basic_string_view s) const noexcept
 	{
+		for (size_type xpos = 0; xpos < this->size (); ++xpos)
+		{
+			for (auto c : s)
+				if (traits::eq (_begin [xpos], c))
+					goto next;
+			return xpos;
+		next:;
+		}
+		return npos;
 	}
 
 	size_type find_first_not_of (charT c) const noexcept
 	{
+		for (size_type xpos = 0; xpos < this->size (); ++xpos)
+			if (!traits::eq (_begin [xpos], c))
+				return xpos;
+		return npos;
 	}
 
 	size_type find_first_not_of (const charT* s) const noexcept
 	{
+		return this->find_first_not_of (basic_string_view {s});
 	}
 
 	size_type find_last_not_of (basic_string_view s) const noexcept
 	{
+		for (size_type xpos = this->size () - 1; xpos != npos; --xpos)
+		{
+			for (auto c : s)
+				if (traits::eq (_begin [xpos], c))
+					goto next;
+			return xpos;
+		next:;
+		}
+		return npos;
 	}
 
 	size_type find_last_not_of (charT c) const noexcept
 	{
+		for (size_type xpos = this->size () - 1; xpos != npos; --xpos)
+			if (!traits::eq (_begin [xpos], c))
+				return xpos;
+		return npos;
 	}
 
 	size_type find_last_not_of (const charT* s) const noexcept
 	{
+		return this->find_last_not_of (basic_string_view {s});
 	}
 };
 
