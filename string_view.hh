@@ -417,28 +417,52 @@ public:
 // [string.view.comparison], non-member basic_string_view comparison functions
 
 template <typename charT, typename traits>
+constexpr inline
 bool operator == (basic_string_view <charT, traits> x,
-                  basic_string_view <charT, traits> y);
+                  basic_string_view <charT, traits> y)
+{
+	return x.compare (y) == 0;
+}
 
 template <typename charT, typename traits>
+constexpr inline
 bool operator != (basic_string_view <charT, traits> x,
-                  basic_string_view <charT, traits> y);
+                  basic_string_view <charT, traits> y)
+{
+	return x.compare (y) != 0;
+}
 
 template <typename charT, typename traits>
+constexpr inline
 bool operator <  (basic_string_view <charT, traits> x,
-                  basic_string_view <charT, traits> y);
+                  basic_string_view <charT, traits> y)
+{
+	return x.compare (y) < 0;
+}
 
 template <typename charT, typename traits>
+constexpr inline
 bool operator >  (basic_string_view <charT, traits> x,
-                  basic_string_view <charT, traits> y);
+                  basic_string_view <charT, traits> y)
+{
+	return x.compare (y) > 0;
+}
 
 template <typename charT, typename traits>
+constexpr inline
 bool operator <= (basic_string_view <charT, traits> x,
-                  basic_string_view <charT, traits> y);
+                  basic_string_view <charT, traits> y)
+{
+	return x.compare (y) <= 0;
+}
 
 template <typename charT, typename traits>
+constexpr inline
 bool operator >= (basic_string_view <charT, traits> x,
-                  basic_string_view <charT, traits> y);
+                  basic_string_view <charT, traits> y)
+{
+	return x.compare (y) >= 0;
+}
 
 
 // [string.view.nonmem], other non-member basic_string_view functions
@@ -447,13 +471,19 @@ template <typename charT,
           typename traits    = std::char_traits <charT>,
           typename Allocator = std::allocator <charT> >
 std::basic_string <charT, traits, Allocator>
-to_string (basic_string_view <charT, traits>,
-           const Allocator& a = Allocator ());
+to_string (basic_string_view <charT, traits> str,
+           const Allocator& a = Allocator ())
+{
+	return {str.begin (), str.end (), a};
+}
 
 template <typename charT, typename traits>
 std::basic_ostream <charT, traits>&
 operator << (std::basic_ostream <charT, traits>& os,
-             basic_string_view <charT,traits> str);
+             basic_string_view <charT,traits> str)
+{
+	return os.write (str.begin (), str.size ());
+}
 
 
 // basic_string_view typedef names
@@ -465,39 +495,92 @@ typedef basic_string_view <wchar_t>  wstring_view;
 
 // basic_string_view conversion
 
-template <typename charT, typename traits>
-int                stoi   (basic_string_view <charT, traits> str, size_t* idx = 0, int base = 10);
-template <typename charT, typename traits>
-long               stol   (basic_string_view <charT, traits> str, size_t* idx = 0, int base = 10);
-template <typename charT, typename traits>
-unsigned long      stoul  (basic_string_view <charT, traits> str, size_t* idx = 0, int base = 10);
-template <typename charT, typename traits>
-long long          stoll  (basic_string_view <charT, traits> str, size_t* idx = 0, int base = 10);
-template <typename charT, typename traits>
-unsigned long long stoull (basic_string_view <charT, traits> str, size_t* idx = 0, int base = 10);
-template <typename charT, typename traits>
-float              stof   (basic_string_view <charT, traits> str, size_t* idx = 0);
-template <typename charT, typename traits>
-double             stod   (basic_string_view <charT, traits> str, size_t* idx = 0);
-template <typename charT, typename traits>
-long double        stold  (basic_string_view <charT, traits> str, size_t* idx = 0);
+int
+stoi   (string_view str, typename string_view::size_type *idx = nullptr, int base = 10)
+{
+}
 
-template <typename charT>
-int                stoi   (const charT* str, size_t* idx = 0, int base = 10);
-template <typename charT>
-long               stol   (const charT* str, size_t* idx = 0, int base = 10);
-template <typename charT>
-unsigned long      stoul  (const charT* str, size_t* idx = 0, int base = 10);
-template <typename charT>
-long long          stoll  (const charT* str, size_t* idx = 0, int base = 10);
-template <typename charT>
-unsigned long long stoull (const charT* str, size_t* idx = 0, int base = 10);
-template <typename charT>
-float              stof   (const charT* str, size_t* idx = 0);
-template <typename charT>
-double             stod   (const charT* str, size_t* idx = 0);
-template <typename charT>
-long double        stold  (const charT* str, size_t* idx = 0);
+long
+stol   (string_view str, typename string_view::size_type *idx = nullptr, int base = 10)
+{
+	const char* next_idx = str.begin ();
+
+	auto retval = std::strtol (str.begin (), const_cast <char**> (&next_idx), base);
+	if (errno != 0)
+	{
+		if (retval == 0)
+			throw std::invalid_argument ("stol");
+		if (errno == ERANGE)
+			throw std::out_of_range ("stol");
+	}
+
+	if (idx != nullptr)
+		*idx = next_idx - str.begin ();
+	return retval;
+}
+
+unsigned long
+stoul  (string_view str, typename string_view::size_type *idx = nullptr, int base = 10)
+{
+}
+
+long long
+stoll  (string_view str, typename string_view::size_type *idx = nullptr, int base = 10)
+{
+}
+
+unsigned long long
+stoull (string_view str, typename string_view::size_type *idx = nullptr, int base = 10)
+{
+}
+
+float
+stof   (string_view str, typename string_view::size_type *idx = nullptr)
+{
+}
+
+double
+stod   (string_view str, typename string_view::size_type *idx = nullptr)
+{
+}
+
+long double
+stold  (string_view str, typename string_view::size_type *idx = nullptr)
+{
+}
+
+
+int stoi (const char* str, std::size_t* idx = 0, int base = 10)
+{
+}
+
+long stol (const char* str, std::size_t* idx = 0, int base = 10)
+{
+}
+
+unsigned long stoul (const char* str, std::size_t* idx = 0, int base = 10)
+{
+}
+
+long long stoll (const char* str, std::size_t* idx = 0, int base = 10)
+{
+}
+
+unsigned long long stoull (const char* str, std::size_t* idx = 0, int base = 10)
+{
+}
+
+float stof (const char* str, std::size_t* idx = 0)
+{
+}
+
+double stod (const char* str, std::size_t* idx = 0)
+{
+}
+
+long double stold (const char* str, std::size_t* idx = 0)
+{
+}
 
 }
 
