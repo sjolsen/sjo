@@ -2,6 +2,14 @@
 #include <limits>
 #include <stdexcept>
 
+#ifdef __GLIBCXX__
+# include <bits/stl_algobase.h> // min, max
+#else
+# include <algorithm>
+#endif
+
+
+
 namespace sjo
 {
 
@@ -15,22 +23,9 @@ std::size_t strlen (const charT* str)
 	return len;
 }
 
-template <typename T, typename U>
-constexpr inline
-auto min (const T& t, const U& u)
-{
-	return t < u ? t : u;
-}
-
-template <typename T, typename U>
-constexpr inline
-auto max (const T& t, const U& u)
-{
-	return t > u ? t : u;
-}
-
 
 // [basic.string.view], basic_string_view:
+
 template <typename charT,
           typename traits = std::char_traits <charT> >
 class basic_string_view
@@ -60,7 +55,7 @@ protected:
 	constexpr
 	basic_string_view _substr (size_type pos, size_type n) const noexcept
 	{
-		return {_begin + pos, min (_begin + pos + n, _end)};
+		return {_begin + pos, std::min (_begin + pos + n, _end)};
 	}
 
 	constexpr
@@ -85,10 +80,19 @@ public:
 
 	// [string.view.cons], construct/copy
 	constexpr
-	basic_string_view  (const basic_string_view&) noexcept = default;
+	basic_string_view (const basic_string_view& other) noexcept
+		: _begin {other._begin},
+		  _end   {other._end}
+	{
+	}
 
 	constexpr
-	basic_string_view& operator = (const basic_string_view&) noexcept = default;
+	basic_string_view& operator = (const basic_string_view& other) noexcept
+	{
+		_begin = other._begin;
+		_end   = other._end;
+		return *this;
+	}
 
 	constexpr
 	basic_string_view () noexcept
@@ -111,33 +115,32 @@ public:
 	{
 	}
 
+	template <typename S_char, typename S_traits, typename S_alloc>
+	basic_string_view (const std::basic_string <S_char, S_traits, S_alloc>& s) noexcept
+		: _begin {s.begin ()},
+		  _end   {s.end ()}
+	{
+	}
+
 	// [string.view.iterators], iterators
-	#define SJO_DEFINE_BEGIN(name)                                          \
+	#define DEFINE_STRING_VIEW_GETTER(name, member)                         \
 	constexpr                                                               \
 	const_iterator name () const noexcept                                   \
 	{                                                                       \
-		return {_begin};                                                \
+		return {member};                                                \
 	}
 
-	#define SJO_DEFINE_END(name)                                            \
-	constexpr                                                               \
-	const_iterator name () const noexcept                                   \
-	{                                                                       \
-		return {_end};                                                  \
-	}
+	DEFINE_STRING_VIEW_GETTER (begin, _begin);
+	DEFINE_STRING_VIEW_GETTER (cbegin, _begin);
+	DEFINE_STRING_VIEW_GETTER (rbegin, _begin);
+	DEFINE_STRING_VIEW_GETTER (crbegin, _begin);
 
-	SJO_DEFINE_BEGIN (begin);
-	SJO_DEFINE_BEGIN (cbegin);
-	SJO_DEFINE_BEGIN (rbegin);
-	SJO_DEFINE_BEGIN (crbegin);
+	DEFINE_STRING_VIEW_GETTER (end, _end);
+	DEFINE_STRING_VIEW_GETTER (cend, _end);
+	DEFINE_STRING_VIEW_GETTER (rend, _end);
+	DEFINE_STRING_VIEW_GETTER (crend, _end);
 
-	SJO_DEFINE_END (end);
-	SJO_DEFINE_END (cend);
-	SJO_DEFINE_END (rend);
-	SJO_DEFINE_END (crend);
-
-	#undef SJO_DEFINE_END
-	#undef SJO_DEFINE_BEGIN
+	#undef DEFINE_STRING_VIEW_GETTER
 
 	// [string.view.capacity], capacity
 	constexpr
@@ -228,7 +231,7 @@ public:
 	constexpr
 	int compare (basic_string_view s) const noexcept
 	{
-		auto rlen = min (this->size (), s.size ());
+		auto rlen = std::min (this->size (), s.size ());
 
 		int cmp = _equal (s, rlen);
 		if (cmp != 0)
@@ -488,99 +491,36 @@ operator << (std::basic_ostream <charT, traits>& os,
 
 // basic_string_view typedef names
 typedef basic_string_view <char>     string_view;
+typedef basic_string_view <wchar_t>  wstring_view;
 typedef basic_string_view <char16_t> u16string_view;
 typedef basic_string_view <char32_t> u32string_view;
-typedef basic_string_view <wchar_t>  wstring_view;
 
 
 // basic_string_view conversion
 
-int
-stoi   (string_view str, typename string_view::size_type *idx = nullptr, int base = 10)
-{
+#define STRING_VIEW_TO_INT_CONVERTER(rtype, name, strvw_t, cvt)                 \
+inline rtype name (strvw_t str, std::size_t *idx = nullptr, int base = 10)      \
+{                                                                               \
+	return std::name (cvt (str), idx, base);                                \
 }
 
-long
-stol   (string_view str, typename string_view::size_type *idx = nullptr, int base = 10)
-{
-	const char* next_idx = str.begin ();
-
-	auto retval = std::strtol (str.begin (), const_cast <char**> (&next_idx), base);
-	if (errno != 0)
-	{
-		if (retval == 0)
-			throw std::invalid_argument ("stol");
-		if (errno == ERANGE)
-			throw std::out_of_range ("stol");
-	}
-
-	if (idx != nullptr)
-		*idx = next_idx - str.begin ();
-	return retval;
+#define STRING_VIEW_TO_FLOAT_CONVERTER(rtype, name, src_t, cvt)                 \
+inline rtype name (src_t str, std::size_t *idx = nullptr)                       \
+{                                                                               \
+	return std::name (cvt (str), idx);                                      \
 }
 
-unsigned long
-stoul  (string_view str, typename string_view::size_type *idx = nullptr, int base = 10)
-{
-}
+STRING_VIEW_TO_INT_CONVERTER   (int,                    stoi,   string_view, to_string);
+STRING_VIEW_TO_INT_CONVERTER   (long int,               stol,   string_view, to_string);
+STRING_VIEW_TO_INT_CONVERTER   (unsigned long int,      stoul,  string_view, to_string);
+STRING_VIEW_TO_INT_CONVERTER   (long long int,          stoll,  string_view, to_string);
+STRING_VIEW_TO_INT_CONVERTER   (unsigned long long int, stoull, string_view, to_string);
+STRING_VIEW_TO_FLOAT_CONVERTER (float,                  stof,   string_view, to_string);
+STRING_VIEW_TO_FLOAT_CONVERTER (double,                 stod,   string_view, to_string);
+STRING_VIEW_TO_FLOAT_CONVERTER (long double,            stold,  string_view, to_string);
 
-long long
-stoll  (string_view str, typename string_view::size_type *idx = nullptr, int base = 10)
-{
-}
-
-unsigned long long
-stoull (string_view str, typename string_view::size_type *idx = nullptr, int base = 10)
-{
-}
-
-float
-stof   (string_view str, typename string_view::size_type *idx = nullptr)
-{
-}
-
-double
-stod   (string_view str, typename string_view::size_type *idx = nullptr)
-{
-}
-
-long double
-stold  (string_view str, typename string_view::size_type *idx = nullptr)
-{
-}
-
-
-int stoi (const char* str, std::size_t* idx = 0, int base = 10)
-{
-}
-
-long stol (const char* str, std::size_t* idx = 0, int base = 10)
-{
-}
-
-unsigned long stoul (const char* str, std::size_t* idx = 0, int base = 10)
-{
-}
-
-long long stoll (const char* str, std::size_t* idx = 0, int base = 10)
-{
-}
-
-unsigned long long stoull (const char* str, std::size_t* idx = 0, int base = 10)
-{
-}
-
-float stof (const char* str, std::size_t* idx = 0)
-{
-}
-
-double stod (const char* str, std::size_t* idx = 0)
-{
-}
-
-long double stold (const char* str, std::size_t* idx = 0)
-{
-}
+#undef STRING_VIEW_TO_INT_CONVERTER
+#undef STRING_VIEW_TO_FLOAT_CONVERTER
 
 }
 
