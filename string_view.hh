@@ -64,7 +64,7 @@ protected:
 	constexpr
 	basic_string_view _substr (size_type pos) const noexcept
 	{
-		return _substr (pos, this->size () - pos);
+		return _substr (pos, this->length () - pos);
 	}
 
 	constexpr
@@ -188,13 +188,13 @@ public:
 	constexpr
 	const charT& front () const
 	{
-		return *_begin;
+		return (*this) [0];
 	}
 
 	constexpr
 	const charT& back () const
 	{
-		return *(_end - 1);
+		return (*this) [this->length () - 1];
 	}
 
 	constexpr
