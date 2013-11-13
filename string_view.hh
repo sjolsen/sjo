@@ -1,5 +1,5 @@
 #ifndef STRING_VIEW_HH
-#define STIRNG_VIEW_HH
+#define STRING_VIEW_HH
 
 #include <string>
 #include <limits>
@@ -21,7 +21,7 @@ constexpr inline
 std::size_t strlen (const charT* str)
 {
 	std::size_t len = 0;
-	while (str != nullptr)
+	while (*str != '\0')
 		++len, ++str;
 	return len;
 }
