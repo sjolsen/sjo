@@ -58,7 +58,7 @@ protected:
 	constexpr
 	basic_string_view _substr (size_type pos, size_type n) const noexcept
 	{
-		return {_begin + pos, std::min (_begin + pos + n, _end)};
+		return {_begin + pos, std::min (pos + n, this->length ())};
 	}
 
 	constexpr
