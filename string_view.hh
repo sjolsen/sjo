@@ -1,3 +1,6 @@
+#ifndef STRING_VIEW_HH
+#define STIRNG_VIEW_HH
+
 #include <string>
 #include <limits>
 #include <stdexcept>
@@ -527,12 +530,24 @@ STRING_VIEW_TO_FLOAT_CONVERTER (long double,            stold,  string_view, to_
 
 // basic_string_view hash specializations
 
+#ifdef __GLIBCXX__
+
 namespace std
 {
 
-template <> struct hash <sjo::string_view>;
-template <> struct hash <sjo::u16string_view>;
-template <> struct hash <sjo::u32string_view>;
-template <> struct hash <sjo::wstring_view>;
+template <typename CharT, typename traits>
+struct hash <sjo::basic_string_view <CharT, traits>>
+	: __hash_base <size_t, sjo::basic_string_view <CharT, traits>>
+{
+	constexpr
+	size_t operator () (const sjo::basic_string_view <CharT, traits>& sv) const noexcept
+	{
+		return std::_Hash_impl::hash (sv.data (), sv.length () * sizeof (sv [0]));
+	}
+};
 
 }
+
+#endif
+
+#endif // STRING_VIEW_HH
