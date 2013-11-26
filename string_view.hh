@@ -18,7 +18,7 @@ constexpr inline
 std::size_t strlen (const charT* str)
 {
 	std::size_t len = 0;
-	while (str != nullptr)
+	while (*str != '\0')
 		++len, ++str;
 	return len;
 }
@@ -105,6 +105,13 @@ public:
 	basic_string_view (const charT* str)
 		: _begin {str},
 		  _end   {str + strlen (str)}
+	{
+	}
+
+	constexpr
+	basic_string_view (const charT* begin, const charT* end)
+		: _begin {begin},
+		  _end   {end}
 	{
 	}
 
@@ -224,8 +231,9 @@ public:
 	basic_string_view substr (size_type pos, size_type n = npos) const
 	{
 		if (pos > this->size ())
-			throw std::out_of_range ("basic_string_view");
-		return _substr (pos, n);
+			return {_end, _end};
+		else
+			return _substr (pos, std::min (n, this->size ()));
 	}
 
 	constexpr
