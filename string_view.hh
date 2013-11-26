@@ -1,3 +1,6 @@
+#ifndef STRING_VIEW_HH
+#define STRING_VIEW_HH
+
 #include <string>
 #include <limits>
 #include <stdexcept>
@@ -55,13 +58,13 @@ protected:
 	constexpr
 	basic_string_view _substr (size_type pos, size_type n) const noexcept
 	{
-		return {_begin + pos, std::min (_begin + pos + n, _end)};
+		return {_begin + pos, std::min (pos + n, this->length ())};
 	}
 
 	constexpr
 	basic_string_view _substr (size_type pos) const noexcept
 	{
-		return _substr (pos, this->size () - pos);
+		return _substr (pos, this->length () - pos);
 	}
 
 	constexpr
@@ -192,13 +195,13 @@ public:
 	constexpr
 	const charT& front () const
 	{
-		return *_begin;
+		return (*this) [0];
 	}
 
 	constexpr
 	const charT& back () const
 	{
-		return *(_end - 1);
+		return (*this) [this->length () - 1];
 	}
 
 	constexpr
@@ -535,12 +538,24 @@ STRING_VIEW_TO_FLOAT_CONVERTER (long double,            stold,  string_view, to_
 
 // basic_string_view hash specializations
 
+#ifdef __GLIBCXX__
+
 namespace std
 {
 
-template <> struct hash <sjo::string_view>;
-template <> struct hash <sjo::u16string_view>;
-template <> struct hash <sjo::u32string_view>;
-template <> struct hash <sjo::wstring_view>;
+template <typename CharT, typename traits>
+struct hash <sjo::basic_string_view <CharT, traits>>
+	: __hash_base <size_t, sjo::basic_string_view <CharT, traits>>
+{
+	constexpr
+	size_t operator () (const sjo::basic_string_view <CharT, traits>& sv) const noexcept
+	{
+		return std::_Hash_impl::hash (sv.data (), sv.length () * sizeof (sv [0]));
+	}
+};
 
 }
+
+#endif
+
+#endif // STRING_VIEW_HH
