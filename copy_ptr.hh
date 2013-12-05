@@ -6,11 +6,11 @@
 namespace sjo
 {
 
-template <typename T, typename Deleter = std::default_delete <T> >
+template <typename T>
 class copy_ptr
-	: std::unique_ptr <T, Deleter>
+	: std::unique_ptr <T>
 {
-	using _base_type = std::unique_ptr <T, Deleter>;
+	using _base_type = std::unique_ptr <T>;
 
 public:
 	using pointer      = typename _base_type::pointer;
