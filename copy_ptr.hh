@@ -29,9 +29,29 @@ public:
 	{
 	}
 
-	copy_ptr (copy_ptr&& other)
+	copy_ptr (copy_ptr&& other) noexcept
 		: copy_ptr (static_cast <_base_type&&> (other))
 	{
+	}
+
+	copy_ptr& operator = (const _base_type& other)
+	{
+		if (*this)
+			**this = *other;
+		else
+			static_cast <_base_type&> (*this) = _base_type (new T (*other));
+		return *this;
+	}
+
+	copy_ptr& operator = (const copy_ptr& other)
+	{
+		return *this = static_cast <_base_type&> (other);
+	}
+
+	copy_ptr& operator = (copy_ptr&& other) noexcept
+	{
+		this->swap (other);
+		return *this;
 	}
 };
 
