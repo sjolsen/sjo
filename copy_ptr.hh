@@ -19,8 +19,21 @@ public:
 
 	using _base_type::_base_type;
 
+	explicit
+	copy_ptr (const T& value)
+		: _base_type (new T (value))
+	{
+	}
+
+	explicit
+	copy_ptr (T&& value)
+		: _base_type (new T (std::move (value)))
+	{
+	}
+
+	explicit
 	copy_ptr (const _base_type& other)
-		: _base_type (new T (*other))
+		: copy_ptr (*other)
 	{
 	}
 
@@ -54,6 +67,12 @@ public:
 		return *this;
 	}
 };
+
+template <typename T>
+copy_ptr <T> make_copy (T&& value)
+{
+	return copy_ptr <T> {std::forward <T> (value)};
+}
 
 } // sjo
 
