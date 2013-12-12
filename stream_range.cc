@@ -18,8 +18,6 @@ bsr_adjust_checked (typename BSR_type::stream_type& _stream,
                     typename BSR_type::difference_type _pos,
                     typename BSR_type::difference_type offset)
 {
-	if (_pos == BSR_type::max_pos)
-		throw std::logic_error ("tried to adjust a past-the-end iterator");
 	if (_pos + offset < 0)
 		throw std::out_of_range ("stream_range underflow");
 
@@ -63,6 +61,27 @@ if (_buffer != other._buffer)\
 # define SJO_BSR_ITERATOR_SOURCE_CHECK
 #endif
 
+#ifdef SJO_DEBUG
+# define SJO_BSR_ITERATOR_END_CHECK [&] {\
+if (_pos == max_pos)\
+	throw std::out_of_range ("invalid operation on past-the-end stream_range iterator");\
+} ()
+#else
+# define SJO_BSR_ITERATOR_END_CHECK
+#endif
+
+SJO_BSR_ITERATOR_TPDECL
+SJO_BSR_ITERATOR::basic_stream_range_iterator (typename SJO_BSR_ITERATOR::stream_type& stream,
+                                               typename SJO_BSR_ITERATOR::buffer_type& buffer,
+                                               typename SJO_BSR_ITERATOR::CONSTRUCT where)
+	: _stream (&stream),
+	  _buffer (&buffer),
+	  _pos (max_pos)
+{
+	if (where == CONSTRUCT_BEGIN)
+		_pos = sjo::detail::bsr_adjust_checked <decltype (*this)> (*_stream, *_buffer, _pos, 1);
+}
+
 SJO_BSR_ITERATOR_TPDECL
 SJO_BSR_ITERATOR&
 SJO_BSR_ITERATOR::operator = (const SJO_BSR_ITERATOR& other)
@@ -84,6 +103,10 @@ SJO_BSR_ITERATOR_TPDECL
 SJO_BSR_ITERATOR_REFERENCE
 SJO_BSR_ITERATOR::operator *() const
 {
+	#ifdef SJO_DEBUG
+	if (_pos < 0 || _pos >= (*_buffer).size ())
+		throw std::out_of_range ("tried to dereference an invalid iterator");
+	#endif
 	return (*_buffer) [_pos];
 }
 
@@ -121,6 +144,7 @@ SJO_BSR_ITERATOR_TPDECL
 SJO_BSR_ITERATOR&
 SJO_BSR_ITERATOR::operator += (SJO_BSR_ITERATOR_DIFFERENCE_TYPE offset)
 {
+	SJO_BSR_ITERATOR_END_CHECK;
 	_pos = sjo::detail::bsr_adjust_checked <decltype (*this)> (*_stream, *_buffer, _pos, offset);
 }
 
@@ -170,6 +194,7 @@ SJO_BSR_ITERATOR_DIFFERENCE_TYPE
 SJO_BSR_ITERATOR::operator - (const SJO_BSR_ITERATOR& other) const
 {
 	SJO_BSR_ITERATOR_SOURCE_CHECK;
+	SJO_BSR_ITERATOR_END_CHECK;
 	return _pos - other._pos;
 }
 
@@ -190,6 +215,7 @@ SJO_BSR_ITERATOR_DEFINE_RELOP (<);
 SJO_BSR_ITERATOR_DEFINE_RELOP (>);
 
 #undef SJO_BSR_ITERATOR_DEFINE_RELOP
+#undef SJO_BSR_ITERATOR_END_CHECK
 #undef SJO_BSR_ITERATOR_SOURCE_CHECK
 #undef SJO_BSR_ITERATOR_DIFFERENCE_TYPE
 #undef SJO_BSR_ITERATOR_REFERENCE
@@ -197,6 +223,20 @@ SJO_BSR_ITERATOR_DEFINE_RELOP (>);
 #undef SJO_BSR_ITERATOR_TPDECL
 
 
+
+#define SJO_BSR_TPDECL template <typename CharT, typename Traits> inline
+#define SJO_BSR basic_stream_range <CharT, Traits>
+#define SJO_BSR_CITERATOR typename SJO_BSR_ITERATOR::const_iterator
+#define SJO_BSR_CREFERENCE typename SJO_BSR_ITERATOR::const_reference
+#define SJO_BSR_DIFFERENCE_TYPE typename SJO_BSR_ITERATOR::difference_type
+
+
+
+#undef SJO_BSR_DIFFERENCE_TYPE
+#undef SJO_BSR_CREFERENCE
+#undef SJO_BSR_CITERATOR
+#undef SJO_BSR
+#undef SJO_BSR_TPDECL
 
 } // namespace sjo
 

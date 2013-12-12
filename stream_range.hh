@@ -46,12 +46,7 @@ protected:
 	using range_type = basic_stream_range <CharT, Traits>;
 	friend range_type;
 
-	basic_stream_range_iterator (stream_type& stream, buffer_type& buffer, CONSTRUCT where)
-		: _stream (&stream),
-		  _buffer (&buffer),
-		  _pos (where == CONSTRUCT_BEGIN ? 0 : max_pos)
-	{
-	}
+	basic_stream_range_iterator (stream_type& stream, buffer_type& buffer, CONSTRUCT where);
 
 public:
 	basic_stream_range_iterator () noexcept = default;
@@ -143,14 +138,14 @@ public:
 	size_type size () const;
 };
 
-#define SJO_BASIC_STREAM_RANGE_SWAP_DEFINER(REF1, REF2)\
+#define SJO_BSR_SWAP_DEFINER(REF1, REF2)\
 template <typename CharT, typename Traits>\
 void swap (basic_stream_range <CharT, Traits>REF1 a, basic_stream_range <CharT, Traits>REF2 b) noexcept;
-SJO_BASIC_STREAM_RANGE_SWAP_DEFINER (&,  &);
-SJO_BASIC_STREAM_RANGE_SWAP_DEFINER (&,  &&);
-SJO_BASIC_STREAM_RANGE_SWAP_DEFINER (&&, &);
-SJO_BASIC_STREAM_RANGE_SWAP_DEFINER (&&, &&);
-#undef SJO_BASIC_STREAM_RANGE_SWAP_DEFINER
+SJO_BSR_SWAP_DEFINER (&,  &);
+SJO_BSR_SWAP_DEFINER (&,  &&);
+SJO_BSR_SWAP_DEFINER (&&, &);
+SJO_BSR_SWAP_DEFINER (&&, &&);
+#undef SJO_BSR_SWAP_DEFINER
 
 } // namespace sjo
 
