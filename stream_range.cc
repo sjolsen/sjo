@@ -12,18 +12,15 @@ namespace detail
 
 // This function does all of the heavy lifting for stream_range
 template <typename BSR_type>
-typename BSR_type::difference_type
+typename BSR_type::size_type
 bsr_adjust_checked (typename BSR_type::stream_type& _stream,
                     typename BSR_type::buffer_type& _buffer,
-                    typename BSR_type::difference_type _pos,
-                    typename BSR_type::difference_type offset)
+                    typename BSR_type::size_type _pos,
+                    typename BSR_type::size_type offset)
 {
-	if (_pos + offset < 0)
-		throw std::out_of_range ("stream_range underflow");
-
 	while (true)
 	{
-		decltype (_pos) buffer_size = _buffer.size ();
+		auto buffer_size = _buffer.size ();
 
 		if (_pos + offset < buffer_size)
 			return _pos + offset;
@@ -52,7 +49,7 @@ bsr_adjust_checked (typename BSR_type::stream_type& _stream,
 #define SJO_BSR_ITERATOR_TPDECL template <typename CharT, typename Traits, typename Stream, typename Buffer> inline
 #define SJO_BSR_ITERATOR basic_stream_range_iterator <CharT, Traits, Stream, Buffer>
 #define SJO_BSR_ITERATOR_REFERENCE typename SJO_BSR_ITERATOR::reference
-#define SJO_BSR_ITERATOR_DIFFERENCE_TYPE typename SJO_BSR_ITERATOR::difference_type
+#define SJO_BSR_ITERATOR_SIZE_TYPE typename SJO_BSR_ITERATOR::size_type
 
 #ifdef SJO_DEBUG
 # define SJO_BSR_ITERATOR_SOURCE_CHECK [&] {\
@@ -114,7 +111,7 @@ SJO_BSR_ITERATOR::operator *() const
 
 SJO_BSR_ITERATOR_TPDECL
 SJO_BSR_ITERATOR_REFERENCE
-SJO_BSR_ITERATOR::operator [] (SJO_BSR_ITERATOR_DIFFERENCE_TYPE offset) const
+SJO_BSR_ITERATOR::operator [] (SJO_BSR_ITERATOR_SIZE_TYPE offset) const
 {
 	return (*_buffer) [_pos + offset];
 }
@@ -144,7 +141,7 @@ SJO_BSR_ITERATOR::operator++ (int)
 
 SJO_BSR_ITERATOR_TPDECL
 SJO_BSR_ITERATOR&
-SJO_BSR_ITERATOR::operator += (SJO_BSR_ITERATOR_DIFFERENCE_TYPE offset)
+SJO_BSR_ITERATOR::operator += (SJO_BSR_ITERATOR_SIZE_TYPE offset)
 {
 	SJO_BSR_ITERATOR_END_CHECK;
 	_pos = sjo::detail::bsr_adjust_checked <typename std::decay <decltype (*this)>::type> (*_stream, *_buffer, _pos, offset);
@@ -153,52 +150,11 @@ SJO_BSR_ITERATOR::operator += (SJO_BSR_ITERATOR_DIFFERENCE_TYPE offset)
 
 SJO_BSR_ITERATOR_TPDECL
 SJO_BSR_ITERATOR
-SJO_BSR_ITERATOR::operator + (SJO_BSR_ITERATOR_DIFFERENCE_TYPE offset) const
+SJO_BSR_ITERATOR::operator + (SJO_BSR_ITERATOR_SIZE_TYPE offset) const
 {
 	auto tmp = *this;
 	tmp += offset;
 	return tmp;
-}
-
-SJO_BSR_ITERATOR_TPDECL
-SJO_BSR_ITERATOR&
-SJO_BSR_ITERATOR::operator --()
-{
-	return *this -= 1;
-}
-
-SJO_BSR_ITERATOR_TPDECL
-SJO_BSR_ITERATOR
-SJO_BSR_ITERATOR::operator-- (int)
-{
-	auto old = *this;
-	--*this;
-	return old;
-}
-
-SJO_BSR_ITERATOR_TPDECL
-SJO_BSR_ITERATOR&
-SJO_BSR_ITERATOR::operator -= (SJO_BSR_ITERATOR_DIFFERENCE_TYPE offset)
-{
-	return *this += -offset;
-}
-
-SJO_BSR_ITERATOR_TPDECL
-SJO_BSR_ITERATOR
-SJO_BSR_ITERATOR::operator - (SJO_BSR_ITERATOR_DIFFERENCE_TYPE offset) const
-{
-	auto tmp = *this;
-	tmp -= offset;
-	return tmp;
-}
-
-SJO_BSR_ITERATOR_TPDECL
-SJO_BSR_ITERATOR_DIFFERENCE_TYPE
-SJO_BSR_ITERATOR::operator - (const SJO_BSR_ITERATOR& other) const
-{
-	SJO_BSR_ITERATOR_SOURCE_CHECK;
-	SJO_BSR_ITERATOR_END_CHECK;
-	return _pos - other._pos;
 }
 
 #define SJO_BSR_ITERATOR_DEFINE_RELOP(OP)\
@@ -220,7 +176,7 @@ SJO_BSR_ITERATOR_DEFINE_RELOP (>);
 #undef SJO_BSR_ITERATOR_DEFINE_RELOP
 #undef SJO_BSR_ITERATOR_END_CHECK
 #undef SJO_BSR_ITERATOR_SOURCE_CHECK
-#undef SJO_BSR_ITERATOR_DIFFERENCE_TYPE
+#undef SJO_BSR_ITERATOR_SIZE_TYPE
 #undef SJO_BSR_ITERATOR_REFERENCE
 #undef SJO_BSR_ITERATOR
 #undef SJO_BSR_ITERATOR_TPDECL
@@ -231,7 +187,6 @@ SJO_BSR_ITERATOR_DEFINE_RELOP (>);
 #define SJO_BSR basic_stream_range <CharT, Traits>
 #define SJO_BSR_CITERATOR typename SJO_BSR::const_iterator
 #define SJO_BSR_CREFERENCE typename SJO_BSR::const_reference
-#define SJO_BSR_DIFFERENCE_TYPE typename SJO_BSR::difference_type
 #define SJO_BSR_SIZE_TYPE typename SJO_BSR::size_type
 #define SJO_BST_BUFFER_TYPE typename SJO_BSR::buffer_type
 
@@ -275,7 +230,7 @@ SJO_BSR::cend () const
 
 SJO_BSR_TPDECL
 SJO_BSR_CREFERENCE
-SJO_BSR::operator [] (difference_type offset) const
+SJO_BSR::operator [] (size_type offset) const
 {
 	return begin () [offset];
 }
@@ -346,7 +301,6 @@ SJO_BSR::size () const
 
 #undef SJO_BST_BUFFER_TYPE
 #undef SJO_BSR_SIZE_TYPE
-#undef SJO_BSR_DIFFERENCE_TYPE
 #undef SJO_BSR_CREFERENCE
 #undef SJO_BSR_CITERATOR
 #undef SJO_BSR

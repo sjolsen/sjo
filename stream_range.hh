@@ -13,9 +13,9 @@ class basic_stream_range;
 
 template <typename CharT, typename Traits, typename Stream, typename Buffer>
 class basic_stream_range_iterator
-	: std::iterator <std::random_access_iterator_tag,
+	: std::iterator <std::forward_iterator_tag,
 	                 CharT,
-	                 typename Buffer::difference_type,
+	                 typename Buffer::size_type,
 	                 const CharT*,
 	                 const CharT&>
 {
@@ -25,17 +25,17 @@ public:
 	using stream_type     = Stream;
 	using buffer_type     = Buffer;
 
-	using difference_type = typename buffer_type::difference_type;
-	using pointer         = const value_type*;
-	using reference       = const value_type&;
+	using size_type = typename buffer_type::size_type;
+	using pointer   = const value_type*;
+	using reference = const value_type&;
 
 	static constexpr
-	const difference_type max_pos = -1;
+	const size_type max_pos = -1;
 
 private:
 	stream_type (*_stream) = nullptr;
 	buffer_type (*_buffer) = nullptr;
-	difference_type _pos   = max_pos;
+	size_type _pos = max_pos;
 
 protected:
 	enum CONSTRUCT
@@ -58,20 +58,13 @@ public:
 	basic_stream_range_iterator& operator = (basic_stream_range_iterator&& other) noexcept;
 
 	reference operator *() const;
-	reference operator [] (difference_type offset) const;
+	reference operator [] (size_type offset) const;
 	const basic_stream_range_iterator& operator->() const;
 
 	basic_stream_range_iterator& operator ++();
 	basic_stream_range_iterator operator++ (int);
-	basic_stream_range_iterator& operator += (difference_type offset);
-	basic_stream_range_iterator operator + (difference_type offset) const;
-
-	basic_stream_range_iterator& operator --();
-	basic_stream_range_iterator operator-- (int);
-	basic_stream_range_iterator& operator -= (difference_type offset);
-	basic_stream_range_iterator operator - (difference_type offset) const;
-
-	difference_type operator - (const basic_stream_range_iterator& other) const;
+	basic_stream_range_iterator& operator += (size_type offset);
+	basic_stream_range_iterator operator + (size_type offset) const;
 
 	bool operator == (const basic_stream_range_iterator& other) const;
 	bool operator != (const basic_stream_range_iterator& other) const;
@@ -97,7 +90,7 @@ public:
 	using const_reference = reference;
 	using iterator        = basic_stream_range_iterator <char_type, traits_type, stream_type, buffer_type>;
 	using const_iterator  = iterator;
-	using difference_type = typename buffer_type::difference_type;
+	using difference_type = typename buffer_type::size_type;
 	using size_type       = typename buffer_type::size_type;
 
 private:
