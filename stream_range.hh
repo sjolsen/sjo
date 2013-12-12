@@ -20,7 +20,8 @@ class basic_stream_range_iterator
 	                 const CharT&>
 {
 public:
-	using value_type      = CharT;
+	using char_type       = CharT;
+	using value_type      = char_type;
 	using stream_type     = Stream;
 	using buffer_type     = Buffer;
 
@@ -101,7 +102,7 @@ public:
 
 private:
 	stream_type (*_stream) = nullptr;
-	buffer_type _buffer;
+	mutable buffer_type _buffer;
 
 public:
 	basic_stream_range (stream_type (*stream))
@@ -114,7 +115,7 @@ public:
 	basic_stream_range (basic_stream_range&&) noexcept = default;
 
 	basic_stream_range& operator = (const basic_stream_range&) = delete;
-	basic_stream_range& operator = (basic_stream_range&&) noexcept;
+	basic_stream_range& operator = (basic_stream_range&& other) noexcept;
 
 	const_iterator begin () const;
 	const_iterator cbegin () const;
@@ -138,14 +139,14 @@ public:
 	size_type size () const;
 };
 
-#define SJO_BSR_SWAP_DEFINER(REF1, REF2)\
+#define SJO_BSR_SWAP_DECLARATOR(REF1, REF2)\
 template <typename CharT, typename Traits>\
 void swap (basic_stream_range <CharT, Traits>REF1 a, basic_stream_range <CharT, Traits>REF2 b) noexcept;
-SJO_BSR_SWAP_DEFINER (&,  &);
-SJO_BSR_SWAP_DEFINER (&,  &&);
-SJO_BSR_SWAP_DEFINER (&&, &);
-SJO_BSR_SWAP_DEFINER (&&, &&);
-#undef SJO_BSR_SWAP_DEFINER
+SJO_BSR_SWAP_DECLARATOR (&,  &);
+SJO_BSR_SWAP_DECLARATOR (&,  &&);
+SJO_BSR_SWAP_DECLARATOR (&&, &);
+SJO_BSR_SWAP_DECLARATOR (&&, &&);
+#undef SJO_BSR_SWAP_DECLARATOR
 
 } // namespace sjo
 
