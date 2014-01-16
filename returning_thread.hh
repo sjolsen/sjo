@@ -6,11 +6,31 @@
 namespace sjo
 {
 
+namespace
+{
+
+template <typename F>
+struct forward_function_impl
+{
+	using type = F;
+};
+
+template <typename Ret, typename... Args>
+struct forward_function_impl <Ret (&) (Args...)>
+{
+	using type = Ret (*) (Args...);
+};
+
+template <typename... Args>
+using forward_function = typename forward_function_impl <Args...>::type;
+
+}
+
 template <typename Ret, typename... Args, typename Func>
 inline
 auto threadable (Func&& f)
 {
-	return [f = std::forward <Func> (f)] (Ret& ret, Args... args) { ret = f (std::forward <Args> (args)...); };
+	return [f = forward_function <Func> (f)] (Ret& ret, Args... args) { ret = f (std::forward <Args> (args)...); };
 }
 
 template <typename Func, typename Ret, typename... Args>
