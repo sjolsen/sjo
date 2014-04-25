@@ -29,4 +29,6 @@ auto ordered_by (Func&& f)
 	{ return f (std::forward <decltype (a)> (a)) < f (std::forward <decltype (b)> (b)); };
 }
 
+#define FNOT(fname) FLIFT (!fname)
+
 #endif
