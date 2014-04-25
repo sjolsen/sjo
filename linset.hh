@@ -3,6 +3,7 @@
 
 #include "index_iterator.hh"
 #include <deque>
+#include <algorithm>
 
 namespace sjo
 {
@@ -30,7 +31,7 @@ public:
 
 private:
 	container_type _data;
-	key_compare _compare;
+	mutable key_compare _compare;
 
 protected:
 	static constexpr

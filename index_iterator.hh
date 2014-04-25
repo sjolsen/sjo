@@ -137,40 +137,22 @@ public:
 	///
 
 	template <typename C1, typename C2>
-	friend bool operator == (const index_iterator_base <C1>& a, const index_iterator_base <C2>& b) noexcept
-	{
-		return a._container == b._container && a._index == b._index;
-	}
+	friend bool operator == (const index_iterator_base <C1>& a, const index_iterator_base <C2>& b) noexcept;
 
 	template <typename C1, typename C2>
-	friend bool operator != (const index_iterator_base <C1>& a, const index_iterator_base <C2>& b) noexcept
-	{
-		return !(a == b);
-	}
+	friend bool operator != (const index_iterator_base <C1>& a, const index_iterator_base <C2>& b) noexcept;
 
 	template <typename C1, typename C2>
-	friend bool operator <  (const index_iterator_base <C1>& a, const index_iterator_base <C2>& b) noexcept
-	{
-		return a._index < b._index;
-	}
+	friend bool operator <  (const index_iterator_base <C1>& a, const index_iterator_base <C2>& b) noexcept;
 
 	template <typename C1, typename C2>
-	friend bool operator <= (const index_iterator_base <C1>& a, const index_iterator_base <C2>& b) noexcept
-	{
-		return a._index <= b._index;
-	}
+	friend bool operator <= (const index_iterator_base <C1>& a, const index_iterator_base <C2>& b) noexcept;
 
 	template <typename C1, typename C2>
-	friend bool operator >  (const index_iterator_base <C1>& a, const index_iterator_base <C2>& b) noexcept
-	{
-		return a._index > b._index;
-	}
+	friend bool operator >  (const index_iterator_base <C1>& a, const index_iterator_base <C2>& b) noexcept;
 
 	template <typename C1, typename C2>
-	friend bool operator >= (const index_iterator_base <C1>& a, const index_iterator_base <C2>& b) noexcept
-	{
-		return a._index >= b._index;
-	}
+	friend bool operator >= (const index_iterator_base <C1>& a, const index_iterator_base <C2>& b) noexcept;
 
 	///
 
@@ -181,10 +163,53 @@ public:
 
 	template <typename C1, typename C2>
 	friend auto operator - (const index_iterator_base <C1>& a, const index_iterator_base <C2>& b)
-	{
-		return b._index - a._index;
-	}
+		-> decltype (b._index - a._index);
 };
+
+template <typename C1, typename C2>
+bool operator == (const index_iterator_base <C1>& a, const index_iterator_base <C2>& b) noexcept
+{
+	return a._container == b._container && a._index == b._index;
+}
+
+template <typename C1, typename C2>
+bool operator != (const index_iterator_base <C1>& a, const index_iterator_base <C2>& b) noexcept
+{
+	return !(a == b);
+}
+
+template <typename C1, typename C2>
+bool operator <  (const index_iterator_base <C1>& a, const index_iterator_base <C2>& b) noexcept
+{
+	return a._index < b._index;
+}
+
+template <typename C1, typename C2>
+bool operator <= (const index_iterator_base <C1>& a, const index_iterator_base <C2>& b) noexcept
+{
+	return a._index <= b._index;
+}
+
+template <typename C1, typename C2>
+bool operator >  (const index_iterator_base <C1>& a, const index_iterator_base <C2>& b) noexcept
+{
+	return a._index > b._index;
+}
+
+template <typename C1, typename C2>
+bool operator >= (const index_iterator_base <C1>& a, const index_iterator_base <C2>& b) noexcept
+{
+	return a._index >= b._index;
+}
+
+template <typename C1, typename C2>
+auto operator - (const index_iterator_base <C1>& a, const index_iterator_base <C2>& b)
+	-> decltype (b._index - a._index)
+{
+	return b._index - a._index;
+}
+
+
 
 template <typename Container>
 class index_iterator
