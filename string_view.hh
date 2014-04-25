@@ -99,56 +99,56 @@ public:
 
 	constexpr
 	basic_string_view () noexcept
-		: _begin {nullptr},
-		  _end   {nullptr}
+		: _begin (nullptr),
+		  _end   (nullptr)
 	{
 	}
 
 	constexpr
 	basic_string_view (const charT* str)
-		: _begin {str},
-		  _end   {str + strlen (str)}
+		: _begin (str),
+		  _end   (str + strlen (str))
 	{
 	}
 
 	constexpr
 	basic_string_view (const charT* begin, const charT* end)
-		: _begin {begin},
-		  _end   {end}
+		: _begin (begin),
+		  _end   (end)
 	{
 	}
 
 	constexpr
 	basic_string_view (const charT* str, size_type len)
-		: _begin {str},
-		  _end   {str + len}
+		: _begin (str),
+		  _end   (str + len)
 	{
 	}
 
 	template <typename S_char, typename S_traits, typename S_alloc>
 	basic_string_view (const std::basic_string <S_char, S_traits, S_alloc>& s) noexcept
-		: _begin {s.begin ()},
-		  _end   {s.end ()}
+		: _begin (s.data ()),
+	          _end   (s.data () + s.length ())
 	{
 	}
 
 	// [string.view.iterators], iterators
-	#define DEFINE_STRING_VIEW_GETTER(name, member)                         \
+	#define DEFINE_STRING_VIEW_GETTER(name, type, member)                   \
 	constexpr                                                               \
-	const_iterator name () const noexcept                                   \
+	type name () const noexcept                                             \
 	{                                                                       \
-		return {member};                                                \
+		return type {member};                                           \
 	}
 
-	DEFINE_STRING_VIEW_GETTER (begin, _begin);
-	DEFINE_STRING_VIEW_GETTER (cbegin, _begin);
-	DEFINE_STRING_VIEW_GETTER (rbegin, _begin);
-	DEFINE_STRING_VIEW_GETTER (crbegin, _begin);
+	DEFINE_STRING_VIEW_GETTER (begin, const_iterator,_begin);
+	DEFINE_STRING_VIEW_GETTER (cbegin, const_iterator, _begin);
+	DEFINE_STRING_VIEW_GETTER (rbegin, reverse_iterator, _end);
+	DEFINE_STRING_VIEW_GETTER (crbegin, reverse_iterator, _end);
 
-	DEFINE_STRING_VIEW_GETTER (end, _end);
-	DEFINE_STRING_VIEW_GETTER (cend, _end);
-	DEFINE_STRING_VIEW_GETTER (rend, _end);
-	DEFINE_STRING_VIEW_GETTER (crend, _end);
+	DEFINE_STRING_VIEW_GETTER (end, const_iterator, _end);
+	DEFINE_STRING_VIEW_GETTER (cend, const_iterator, _end);
+	DEFINE_STRING_VIEW_GETTER (rend, reverse_iterator, _begin);
+	DEFINE_STRING_VIEW_GETTER (crend, reverse_iterator, _begin);
 
 	#undef DEFINE_STRING_VIEW_GETTER
 

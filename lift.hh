@@ -21,4 +21,6 @@
 	return fname (std::forward <decltype (args)> (args)...); \
 }
 
+#define FNOT(fname) FLIFT (!fname)
+
 #endif
