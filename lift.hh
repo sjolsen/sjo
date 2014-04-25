@@ -21,4 +21,12 @@
 	return fname (std::forward <decltype (args)> (args)...); \
 }
 
+template <typename Func>
+inline constexpr
+auto ordered_by (Func&& f)
+{
+	return [f = std::forward <Func> (f)] (auto&& a, auto&& b)
+	{ return f (std::forward <decltype (a)> (a)) < f (std::forward <decltype (b)> (b)); };
+}
+
 #endif
