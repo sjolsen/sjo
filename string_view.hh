@@ -68,9 +68,21 @@ protected:
 	}
 
 	constexpr
+	int _compare (basic_string_view str, size_type distance) const noexcept
+	{
+		return traits::compare (_begin, str._begin, distance);
+	}
+
+	constexpr
+	int _compare (basic_string_view str) const noexcept
+	{
+		return _compare (str, str.size ());
+	}
+
+	constexpr
 	bool _equal (basic_string_view str, size_type distance) const noexcept
 	{
-		return traits::compare (_begin, str._begin, distance) == 0;
+		return _compare (str, distance) == 0;
 	}
 
 	constexpr
@@ -244,7 +256,7 @@ public:
 	{
 		auto rlen = std::min (this->size (), s.size ());
 
-		int cmp = _equal (s, rlen);
+		int cmp = _compare (s, rlen);
 		if (cmp != 0)
 			return cmp;
 		else
