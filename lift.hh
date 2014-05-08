@@ -21,6 +21,18 @@
 	return fname (std::forward <decltype (args)> (args)...); \
 }
 
+#define UOPLIFT(sym) \
+[] (auto&& arg) -> decltype (auto) \
+{ \
+	return sym (std::forward <decltype (arg)> (arg)); \
+}
+
+#define BOPLIFT(sym) \
+[] (auto&& arg1, auto&& arg2) -> decltype (auto) \
+{ \
+	return (std::forward <decltype (arg1)> (arg1)) sym (std::forward <decltype (arg2)> (arg2)); \
+}
+
 template <typename Func>
 inline constexpr
 auto ordered_by (Func&& f)
